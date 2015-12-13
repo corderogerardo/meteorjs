@@ -3,6 +3,18 @@
 </head>
 
 <body>
+	
+	
+</body>
+
+<template name="ApplicationLayaout">
+
+	{{> yield "navbar"}}
+	{{> yield "main"}}
+	
+</template>
+
+<template name="navbar">
 	<!-- navbar  - you will be putting the login functions here -->
 
 	<nav class="navbar navbar-default" role="navigation">
@@ -24,6 +36,7 @@
 				<li><a href="#">{{> loginButtons}}</a></li>
 			</ul>
 			
+			
 			<ul class="nav navbar-nav navbar-right">
 				<li><a href="#"></a></li>
 				<li class="dropdown">
@@ -37,12 +50,14 @@
 		</div><!-- /.navbar-collapse -->
 	</nav> <!-- end navbar -->
 
+</template>
+
+<template name="container">
 	<div class="container">
 		{{> website_form}}
 		{{> website_list}}
 	</div>
-</body>
-
+</template>
 
 <template name="website_form">
 	{{#if currentUser}}
@@ -82,18 +97,86 @@
 
 <!-- template that displays individual website entries -->
 <template name="website_item">
+
 <li>
 	<a href="{{url}}">{{title}}</a>
 	<p>
-		{{description}}
+		{{description}} <a href="/websiteDetail/{{_id}}" title="">More Info</a>
 	</p>
-	<p>{{votes}} Votes</p>
-	<a href="#" class="btn btn-default js-upvote">
+	<p>Date: {{createdOn}}</p>
+	<a href="#" class="btn btn-default js-upvote">{{votes}}
 		<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
 	</a>
-	<a href="#" class="btn btn-default js-downvote">
+	<a href="#" class="btn btn-default js-downvote">{{downvotes}}
 		<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
 	</a>
+	<!-- you will be putting your up and down vote buttons in here! -->
+</li>
+
+</template>
+<template name="websiteDetail">
+<div class="container">
+
+	<ol class="breadcrumb">
+			<li>
+				<a href="/">Home</a>
+			</li>
+			<li>
+				<a href="/websiteDetail/{{_id}}">{{title}}</a>
+			</li>
+			<li class="active">Current</li>
+		</ol>	
+
+	<a href="{{url}}"><h1>{{title}}</h1></a>
+	<p>
+		{{description}}
+	</p>
+	<p>
+		{{> comments_list}}
+	</p>
+	<p>Date: {{createdOn}}</p>
+	<a href="#" class="btn btn-default js-upvote">{{votes}}
+		<span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span>
+	</a>
+	<a href="#" class="btn btn-default js-downvote">{{downvotes}}
+		<span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span>
+	</a>
+	<!-- you will be putting your up and down vote buttons in here! -->
+	<p>{{>comments_form}}</p>
+	
+</div>
+</template>
+
+<!-- comments of users -->
+<template name="comments_form">
+	<div id="coment_form" class="">
+		<form class="js-save-comment-form">
+		  <div class="form-group">
+		    <label for="comment">Comment</label>
+		    <input type="text" class="form-control" id="comment" placeholder="Insert your comment here!">
+		  </div>
+	
+		  <button type="submit" class="btn btn-default">Submit</button>
+		</form>
+	</div>
+</template>
+
+<!-- template that displays several comments items -->
+<template name="comments_list">
+	<ol>
+	{{#each comments}}
+	{{>comment_item}}
+	{{/each}}
+	</ol>
+</template>
+
+<!-- template that displays individual comments entries -->
+<template name="comment_item">
+<li>
+	<p>{{comment}}</p>
+	<p>{{createdOn}}</p>
+
+
 	<!-- you will be putting your up and down vote buttons in here! -->
 </li>
 

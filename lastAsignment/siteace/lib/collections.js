@@ -1,15 +1,18 @@
 Websites = new Mongo.Collection("websites");
-
+Comments = new Mongo.Collection("comments");
+/// easy search
 //set up security on siteace
 Websites.allow({
 	insert: function (userId, doc) {
 		//...
-		console.log("testing security on image insert");
+		console.log("testing security on website insert");
 		if(Meteor.user()){
 			if(userId != doc.createdBy){
 				return false;
 			}
 			else{
+				 
+	
 				return true;
 			}
 		}
@@ -19,7 +22,7 @@ Websites.allow({
 	},
 	update: function (userId, doc, fields, modifier) {
 		//...
-		console.log("testing security on image update");
+		console.log("testing security on website update");
 		if(Meteor.user()){
 			return true; // they are logged in
 		}
@@ -32,4 +35,21 @@ Websites.allow({
 		return true;
 	},
 	
+});
+Comments.allow({
+	insert: function (userId, doc) {
+		//...
+		console.log("testing security on comments insert");
+		if(Meteor.user()){
+			if(userId != doc.createdBy){
+				return false;
+			}
+			else{
+				return true;
+			}
+		}
+		else{
+			return false;
+		}
+	}
 });

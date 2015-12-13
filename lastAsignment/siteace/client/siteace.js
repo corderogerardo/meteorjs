@@ -1,7 +1,34 @@
-/// routing
 
+/// routing
+	
+	Router.configure({
+		layoutTemplate: 'ApplicationLayaout',
+	});
+
+	Router.route('/',function(){
+		this.render('navbar',{
+			to:"navbar"
+		});
+		this.render('container',{
+			to:"main"
+		});
+	});
+	Router.route('/websiteDetail/:_id', function() {
+		this.render('navbar', {
+			to:'navbar'
+		});
+		this.render('websiteDetail',{
+			to:'main',
+			data:function(){
+				return Websites.findOne({_id:this.params._id});
+				return Comments.find({websiteId:this.params._id});
+			}
+		});
+	});
 
 /// end routing
+   
+
 
 ///infintescroll
 	Session.set("websiteLimit",20);
@@ -35,9 +62,9 @@ Accounts.ui.config({
 	Template.website_list.helpers({
 		websites:function(){
 			if(Session.get("voteFilter")){ //Filtros
-				return Websites.find({createdBy:Session.get("voteFilter")},{sort:{createdOn:-1,votes:-1}},{reactive:true});
+				return Websites.find({createdBy:Session.get("voteFilter")},{sort:{votes:-1}},{reactive:true});
 			} else{
-				return Websites.find({}, {sort:{createdOn:-1,votes:-1}, limit:Session.get("websiteLimit")});			
+				return Websites.find({}, {sort:{votes:-1}, limit:Session.get("websiteLimit")});			
 			}
 		},
 		filtering_websites:function(){
@@ -63,7 +90,16 @@ Accounts.ui.config({
 			} else{
 				return "guest";
 			}
-		}
+		},
+		
+	});
+
+
+	Template.comments_list.helpers({
+		comments:function(){
+			return Comments.find({websiteId:this._id});
+		},
+		
 	});
 
 
@@ -81,6 +117,7 @@ Accounts.ui.config({
 			Websites.update({_id:website_id}, 
 					{$inc: {votes: 1}}
 					);
+			Session.set("userFilter", this.createdBy)
 			return false;// prevent the button from reloading the page
 		}, 
 		"click .js-downvote":function(event){
@@ -91,11 +128,12 @@ Accounts.ui.config({
 			console.log("Down voting website with id "+website_id);
 
 			// put the code in here to remove a vote from a website!
-			Websites.update({_id:website_id}, {$inc: {votes: -1}}
+			Websites.update({_id:website_id}, {$inc: {downvotes: -1}}
 				);
+			Session.set("userFilter", this.createdBy)
 			return false;// prevent the button from reloading the page
 		}
-	})
+	});
 
 	Template.website_form.events({
 		"click .js-toggle-website-form":function(event){
@@ -121,6 +159,30 @@ Accounts.ui.config({
 				});
 			}	
 			$("#website_form").toggle('slow');
+			return false;// stop the form submit from reloading the page
+
+		}
+	});
+	Template.comments_form.events({
+		"submit .js-save-comment-form":function(event){
+
+			// here is an example of how to get the url out of the form:
+			var comment = $("#comment").val();
+			var website_id = this._id;
+			
+
+			console.log("The comment they entered is: "+comment);
+			
+			//  put your website saving code in here!
+			if(Meteor.user()){
+				Comments.insert({
+					websiteId:website_id,
+					comment:comment,
+					createdOn: new Date(),
+					createdBy:Meteor.user()._id
+				});
+			}	
+			comment.val("");
 			return false;// stop the form submit from reloading the page
 
 		}
